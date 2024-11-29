@@ -1,10 +1,11 @@
-from cytoolz import interpose
+import time
+
 from pymeasure.instruments import Instrument, SCPIMixin
 from pymeasure.instruments.validators import strict_discrete_set, \
     truncated_range
 
 from enum import IntFlag
-from string import Template
+
 
 class TestErrorCode(IntFlag):
     QUARTER_SCALE_VOLTAGE_READBACK = 512
@@ -20,6 +21,7 @@ class TestErrorCode(IntFlag):
     OK = 0
 
 OPERATING_MODES = ['VOLT', 'CURR']
+
 
 class KepcoBOP5020(SCPIMixin, Instrument):
 
@@ -259,6 +261,20 @@ class KepcoBOP5020(SCPIMixin, Instrument):
         validator=truncated_range,
         values=[-1 * _Imax, _Imax]
     )
+
+    def set_current(self, current, tolerance=0.02):
+        """Function sets the output current in A (float) and waits until it is reached within a tolerance.
+        Parameters
+        ----------
+        current: float
+          Output current in A
+        tolerance: float
+          Tolerance for the actual current in A
+        """
+        self.current_setpoint = current
+
+        while abs(current - self.current) > tolerance:
+            time.sleep(0.05)
 
     def arm_single_trigger(self):
         """Function enables the use of single trigger and prepares the PS to receive a single trigger."""
