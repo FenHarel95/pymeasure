@@ -161,7 +161,7 @@ class VNAChannel(Channel):
         """Control number of consecutive sweeps to be combined for the sweep average.""",
         cast=int,
         validator=strict_range,
-        values=[1, sweep_number],
+        values=[1, 1000],
         dynamic=True,
     )
 
